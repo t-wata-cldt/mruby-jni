@@ -20,5 +20,5 @@ MRuby::Gem::Specification.new 'mruby-jni' do |s|
   task :test => test_exec do
     `install_name_tool -delete_rpath #{jre_home}/lib/server #{test_exec}`
     sh "install_name_tool -add_rpath #{jre_home}/lib/server #{test_exec}"
-  end
+  end if `uname -s`.strip == 'Darwin'
 end
