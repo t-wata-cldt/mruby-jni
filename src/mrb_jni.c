@@ -77,6 +77,9 @@ static mrb_value vm_env(mrb_state *M, mrb_value self) {
 }
 
 static mrb_value wrap_object(mrb_state *M, char const *cls, void* ptr, mrb_data_type const* t) {
+  if (!ptr) {
+    mrb_raisef(M, JNI_ERROR, "Cannot wrap: %S", mrb_str_new_cstr(M, cls));
+  }
   return mrb_obj_value(mrb_data_object_alloc(
       M, mrb_class_get_under(M, mrb_module_get(M, "JNI"), cls), ptr, t));
 }

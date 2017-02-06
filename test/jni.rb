@@ -16,3 +16,10 @@ assert 'Call Math.abs' do
   abs = env.static_method_id math, "abs", "(F)F"
   assert_equal 2.0, env.call_static_float_method(math, abs, -2.0)
 end
+
+assert 'Not found' do
+  env = vm.env
+  assert_raise JNIError do
+    env.find_class "Ljava/lang/MathInvalid;"
+  end
+end
