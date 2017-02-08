@@ -8,7 +8,7 @@ MRuby::Gem::Specification.new 'mruby-jni' do |s|
     FileUtils.mkdir_p build_dir
     `javac -d #{build_dir} #{dir}/java_home.java`
   end
-  jre_home = "#{`java -classpath #{build_dir} JavaHome`.strip}"
+  jre_home = `java -classpath #{build_dir} JavaHome`.strip
   java_home = "#{jre_home}/.."
 
   s.cc.include_paths << "#{java_home}/include"
