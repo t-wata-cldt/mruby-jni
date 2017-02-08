@@ -50,12 +50,6 @@ static mrb_value vm_init(mrb_state *M, mrb_value self) {
 static void jobject_free(mrb_state *M, void *ptr) {}
 static mrb_data_type const jobject_type = { "JObject", jobject_free };
 
-static void jclass_free(mrb_state *M, void *ptr) {}
-static mrb_data_type const jclass_type = { "JClass", jclass_free };
-
-static void jstring_free(mrb_state *M, void *ptr) {}
-static mrb_data_type const jstring_type = { "JString", jstring_free };
-
 static void jfield_id_free(mrb_state *M, void *ptr) {}
 static mrb_data_type const jfield_id_type = { "JFieldID", jfield_id_free };
 
@@ -89,14 +83,14 @@ static mrb_value env_find_class(mrb_state *M, mrb_value self) {
   char const *name;
   mrb_get_args(M, "z", &name);
 
-  return wrap_object(M, "JClass", (*env)->FindClass(env, name), &jclass_type);
+  return wrap_object(M, "JClass", (*env)->FindClass(env, name), &jobject_type);
 }
 
 static mrb_value env_static_field_id(mrb_state *M, mrb_value self) {
   JNIEnv *env = (JNIEnv*)DATA_PTR(self);
   jclass cls;
   char const *type, *name;
-  mrb_get_args(M, "dzz", &cls, &jclass_type, &type, &name);
+  mrb_get_args(M, "dzz", &cls, &jobject_type, &type, &name);
 
   return wrap_object(M, "JFieldID", (*env)->GetStaticFieldID(env, cls, type, name), &jfield_id_type);
 }
@@ -105,7 +99,7 @@ static mrb_value env_static_object_field(mrb_state *M, mrb_value self) {
   JNIEnv *env = (JNIEnv*)DATA_PTR(self);
   jclass cls;
   jfieldID field_id;
-  mrb_get_args(M, "dd", &cls, &jclass_type, &field_id, &jfield_id_type);
+  mrb_get_args(M, "dd", &cls, &jobject_type, &field_id, &jfield_id_type);
 
   return wrap_object(M, "JObject", (*env)->GetStaticObjectField(env, cls, field_id), &jobject_type);
 }
@@ -115,14 +109,14 @@ static mrb_value env_object_class(mrb_state *M, mrb_value self) {
   jobject obj;
   mrb_get_args(M, "d", &obj, &jobject_type);
 
-  return wrap_object(M, "JClass", (*env)->GetObjectClass(env, obj), &jclass_type);
+  return wrap_object(M, "JClass", (*env)->GetObjectClass(env, obj), &jobject_type);
 }
 
 static mrb_value env_method_id(mrb_state *M, mrb_value self) {
   JNIEnv *env = (JNIEnv*)DATA_PTR(self);
   jclass cls;
   char const *meth, *args;
-  mrb_get_args(M, "dzz", &cls, &jclass_type, &meth, &args);
+  mrb_get_args(M, "dzz", &cls, &jobject_type, &meth, &args);
 
   return wrap_object(M, "JMethodID", (*env)->GetMethodID(env, cls, meth, args), &jmethod_id_type);
 }
@@ -131,7 +125,7 @@ static mrb_value env_static_method_id(mrb_state *M, mrb_value self) {
   JNIEnv *env = (JNIEnv*)DATA_PTR(self);
   jclass cls;
   char const *meth, *args;
-  mrb_get_args(M, "dzz", &cls, &jclass_type, &meth, &args);
+  mrb_get_args(M, "dzz", &cls, &jobject_type, &meth, &args);
 
   return wrap_object(M, "JMethodID", (*env)->GetStaticMethodID(env, cls, meth, args), &jmethod_id_type);
 }
@@ -140,7 +134,7 @@ static mrb_value env_new_string_utf(mrb_state *M, mrb_value self) {
   JNIEnv *env = (JNIEnv*)DATA_PTR(self);
   char const *str;
   mrb_get_args(M, "z", &str);
-  return wrap_object(M, "JString", (*env)->NewStringUTF(env, str), &jstring_type);
+  return wrap_object(M, "JString", (*env)->NewStringUTF(env, str), &jobject_type);
 }
 
 static jvalue to_jvalue(mrb_state *M, JNIEnv *env, mrb_value v) {
@@ -156,7 +150,7 @@ static jvalue to_jvalue(mrb_state *M, JNIEnv *env, mrb_value v) {
     return ret;
   }
 
-  ret.l = mrb_data_check_get_ptr(M, v, &jstring_type);
+  ret.l = mrb_data_check_get_ptr(M, v, &jobject_type);
   if (!ret.l) {
     ret.l = mrb_data_get_ptr(M, v, &jobject_type);
   }
@@ -201,7 +195,7 @@ static mrb_value env_call_static_float_method(mrb_state *M, mrb_value self) {
   jmethodID meth;
   mrb_value const *argv;
   mrb_int argc;
-  mrb_get_args(M, "dd*", &obj, &jclass_type, &meth, &jmethod_id_type, &argv, &argc);
+  mrb_get_args(M, "dd*", &obj, &jobject_type, &meth, &jmethod_id_type, &argv, &argc);
 
   jvalue jargs[argc];
   for (mrb_int i = 0; i < argc; ++i) {
